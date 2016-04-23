@@ -226,24 +226,24 @@ All data objects share a common `class` property which identifies the
 object's class. The available class names, as of this version of LAMI,
 are:
 
-| Class name (string) | Object |
-|---|---|
-| `unknown` | [Unknown object](#unknown-object) |
-| `ratio` | [Ratio object](#ratio-object) |
-| `timestamp` | [Timestamp object](#timestamp-object) |
-| `time-range` | [Time range object](#time-range-object) |
-| `duration` | [Duration object](#duration-object) |
-| `size` | [Size object](#size-object) |
-| `bitrate` | [Bitrate object](#bitrate-object) |
-| `syscall` | [Syscall object](#syscall-object) |
-| `process` | [Process object](#process-object) |
-| `path` | [Path object](#path-object) |
-| `fd` | [File descriptor object](#file-descriptor-object) |
-| `irq` | [IRQ object](#irq-object) |
-| `cpu` | [CPU object](#cpu-object) |
-| `disk` | [Disk object](#disk-object) |
-| `part` | [Disk partition object](#disk-partition-object) |
-| `netif` | [Network interface object](#network-interface-object) |
+| Class name (string) | Object | Implicit unit |
+|---|---|---|
+| `unknown` | [Unknown object](#unknown-object) | N/A |
+| `ratio` | [Ratio object](#ratio-object) | N/A, although it is suggested to present a ratio as a percentage by multiplying its value by 100 |
+| `timestamp` | [Timestamp object](#timestamp-object) | ns since Unix epoch |
+| `time-range` | [Time range object](#time-range-object) | N/A |
+| `duration` | [Duration object](#duration-object) | ns |
+| `size` | [Size object](#size-object) | bytes |
+| `bitrate` | [Bitrate object](#bitrate-object) | bits/second |
+| `syscall` | [Syscall object](#syscall-object) | N/A |
+| `process` | [Process object](#process-object) | N/A |
+| `path` | [Path object](#path-object) | N/A |
+| `fd` | [File descriptor object](#file-descriptor-object) | N/A |
+| `irq` | [IRQ object](#irq-object) | N/A |
+| `cpu` | [CPU object](#cpu-object) | N/A |
+| `disk` | [Disk object](#disk-object) | N/A |
+| `part` | [Disk partition object](#disk-partition-object) | N/A |
+| `netif` | [Network interface object](#network-interface-object) | N/A |
 
 The following subsections explain each class of data object.
 
