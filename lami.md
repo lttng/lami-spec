@@ -223,7 +223,8 @@ during its execution.
 _Data objects_ contain result data of specific classes.
 
 All data objects share a common `class` property which identifies the
-object's class. The available values are:
+object's class. The available class names, as of this version of LAMI,
+are:
 
 | Class name (string) | Object |
 |---|---|
