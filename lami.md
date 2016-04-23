@@ -908,7 +908,7 @@ columns.
 |---|---|---|---|---|
 | `time-range` | [Time range object](#time-range-object) | Time range over which the results contained in this table apply | Yes | N/A |
 | `class` | String or [table class object](#table-class-object) | Table class name or table class object containing the metadata of this result table | Yes | N/A |
-| `data` | Array of arrays of data objects/plain JSON values | Result table rows | Yes (at least one row) | N/A |
+| `data` | Array of arrays of [data objects](#data-objects)/plain JSON values | Result table rows | Yes (at least one row) | N/A |
 
 The `class` property indicates either:
 
