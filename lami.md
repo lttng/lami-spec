@@ -226,7 +226,7 @@ All data objects share a common `class` property which identifies the
 object's class. The available class names, as of this version of LAMI,
 are:
 
-| Class name (string) | Object | Implicit unit |
+| Class name (string) | Object | Implicit unit of measurement |
 |---|---|---|
 | `unknown` | [Unknown object](#unknown-object) | N/A |
 | `ratio` | [Ratio object](#ratio-object) | N/A, although it is suggested to present a ratio as a percentage by multiplying its value by 100 |
@@ -271,9 +271,9 @@ produce a result for some reason.
 
 ##### Ratio object
 
-A _ratio object_ describes a simple, dimensionless ratio, that is,
-a relationship between two quantities having the same unit indicating
-how many times the first quantity contains the second.
+A _ratio object_ describes a simple, dimensionless ratio, that is, a
+relationship between two quantities having the same unit of measurement
+indicating how many times the first quantity contains the second.
 
 It is suggested that the consumer shows a ratio object as a percentage
 by multiplying its value by 100.
@@ -630,7 +630,7 @@ A _column description object_ describes one table _column_.
 |---|---|---|---|---|
 | `title` | String | Column's title | No | No title |
 | `class` | String | Class of data in column's cells, amongst: <ul><li>`string`: JSON strings</li><li>`int`: JSON numbers limited to integers</li><li>`number`: JSON numbers</li><li>`bool`: JSON booleans</li><li>`ratio`: [ratio objects](#ratio-object)</li><li>`timestamp`: [timestamp objects](#timestamp-object)</li><li>`time-range`: [time range objects](#time-range-object)</li><li>`duration`: [duration objects](#duration-object)</li><li>`size`: [size objects](#size-object)</li><li>`bitrate`: [bitrate objects](#bitrate-object)</li><li>`syscall`: [syscall objects](#syscall-object)</li><li>`process`: [process objects](#process-object)</li><li>`path`: [path objects](#path-object)</li><li>`fd`: [file descriptor objects](#file-descriptor-object)</li><li>`irq`: [IRQ objects](#irq-object)</li><li>`cpu`: [CPU objects](#cpu-object)</li><li>`disk`: [disk objects](#disk-object)</li><li>`part`: [disk partition objects](#disk-partition-object)</li><li>`netif`: [network interface objects](#network-interface-object)</li><li>`mixed`: any object</li></ul> | No | `mixed` |
-| `unit` | String | Column's unit, if the `class` property is `string`, `int`, `number`, or `bool` | No | No unit |
+| `unit` | String | Column's unit of measurement, if the `class` property is `string`, `int`, `number`, or `bool` | No | No unit of measurement |
 
 **Examples**:
 
