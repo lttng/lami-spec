@@ -275,7 +275,8 @@ A _ratio object_ describes a simple, dimensionless ratio, that is,
 a relationship between two quantities having the same unit indicating
 how many times the first quantity contains the second.
 
-It is suggested that the consumer shows a ratio object as a percentage.
+It is suggested that the consumer shows a ratio object as a percentage
+by multiplying its value by 100.
 
 **Properties**:
 
