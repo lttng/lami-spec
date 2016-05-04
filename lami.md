@@ -226,24 +226,27 @@ All data objects share a common `class` property which identifies the
 object's class. The available class names, as of this version of LAMI,
 are:
 
-| Class name (string) | Object |
-|---|---|
-| `unknown` | [Unknown object](#unknown-object) |
-| `ratio` | [Ratio object](#ratio-object) |
-| `timestamp` | [Timestamp object](#timestamp-object) |
-| `time-range` | [Time range object](#time-range-object) |
-| `duration` | [Duration object](#duration-object) |
-| `size` | [Size object](#size-object) |
-| `bitrate` | [Bitrate object](#bitrate-object) |
-| `syscall` | [Syscall object](#syscall-object) |
-| `process` | [Process object](#process-object) |
-| `path` | [Path object](#path-object) |
-| `fd` | [File descriptor object](#file-descriptor-object) |
-| `irq` | [IRQ object](#irq-object) |
-| `cpu` | [CPU object](#cpu-object) |
-| `disk` | [Disk object](#disk-object) |
-| `part` | [Disk partition object](#disk-partition-object) |
-| `netif` | [Network interface object](#network-interface-object) |
+| Class name (string) | Object | Inherits |
+|---|---|---|
+| `unknown` | [Unknown object](#unknown-object) | Data object
+| `bool` | [Boolean object](#boolean-object) | Data object
+| `number` | [Number object](#number-object) | Data object
+| `string` | [String object](#string-object) | Data object
+| `ratio` | [Ratio object](#ratio-object) | [Number object](#number-object)
+| `timestamp` | [Timestamp object](#timestamp-object) | [Number object](#number-object)
+| `duration` | [Duration object](#duration-object) | [Number object](#number-object)
+| `size` | [Size object](#size-object) | [Number object](#number-object)
+| `bitrate` | [Bitrate object](#bitrate-object) | [Number object](#number-object)
+| `time-range` | [Time range object](#time-range-object) | Data object
+| `syscall` | [Syscall object](#syscall-object) | Data object
+| `process` | [Process object](#process-object) | Data object
+| `path` | [Path object](#path-object) | Data object
+| `fd` | [File descriptor object](#file-descriptor-object) | Data object
+| `irq` | [IRQ object](#irq-object) | Data object
+| `cpu` | [CPU object](#cpu-object) | Data object
+| `disk` | [Disk object](#disk-object) | Data object
+| `part` | [Disk partition object](#disk-partition-object) | Data object
+| `netif` | [Network interface object](#network-interface-object) | Data object
 
 The following subsections explain each class of data object.
 
@@ -269,6 +272,97 @@ produce a result for some reason.
 ```
 
 
+##### Boolean object
+
+A _boolean object_ represents a boolean value.
+
+**Properties**:
+
+| Property | Type | Description | Required? | Default value |
+|---|---|---|---|---|
+| `class` | String | Set to `bool` | Yes | N/A |
+| `value` | Boolean | Value | Yes | N/A |
+
+**Example**:
+
+```json
+{
+  "class": "bool",
+  "value": false
+}
+```
+
+
+##### Number object
+
+A _number object_ represents a number.
+
+**Properties**:
+
+| Property | Type | Description | Required? | Default value |
+|---|---|---|---|---|
+| `class` | String | Set to `number` | Yes | N/A |
+| `value` | Number | Value | Yes, if `low` and `high` properties are missing | No value |
+| `low` | Number or string | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+| `high` | Number or string | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+
+The `low` and `high` properties may be set to either `"-inf"` (negative infinity) or `"+inf"` (positive infinity).
+
+**Examples**:
+
+```json
+{
+  "class": "number",
+  "value": -23.75
+}
+```
+
+```json
+{
+  "class": "number",
+  "value": 19.72,
+  "low": 15.99,
+  "high": 23.18
+}
+```
+
+```json
+{
+  "class": "number",
+  "low": 20.52,
+  "high": 24.18
+}
+```
+
+```json
+{
+  "class": "number",
+  "low": 6675.92,
+  "high": "+inf"
+}
+```
+
+##### String object
+
+A _string object_ represents a string value.
+
+**Properties**:
+
+| Property | Type | Description | Required? | Default value |
+|---|---|---|---|---|
+| `class` | String | Set to `string` | Yes | N/A |
+| `value` | String | Value | Yes | N/A |
+
+**Example**:
+
+```json
+{
+  "class": "string",
+  "value": "The LAMI specification is awesome!"
+}
+```
+
+
 ##### Ratio object
 
 A _ratio object_ describes a simple, dimensionless ratio, that is,
@@ -282,14 +376,26 @@ It is suggested that the consumer shows a ratio object as a percentage.
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
 | `class` | String | Set to `ratio` | Yes | N/A |
-| `value` | Number | Ratio as a decimal fraction | Yes | N/A |
+| `value` | Number | Ratio as a decimal fraction | Yes, if `low` and `high` properties are missing | No value |
+| `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+| `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 
-**Example**:
+The `low` and `high` properties may be set to either `"-inf"` (negative infinity) or `"+inf"` (positive infinity).
+
+**Examples**:
 
 ```json
 {
   "class": "ratio",
   "value": 0.57
+}
+```
+
+```json
+{
+  "class": "ratio",
+  "low": 0.23,
+  "high": 0.27
 }
 ```
 
@@ -303,7 +409,11 @@ A _timestamp object_ describes a specific point in time.
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
 | `class` | String | Set to `timestamp` | Yes | N/A |
-| `value` | Number | Number of nanoseconds since Unix epoch | Yes | N/A |
+| `value` | Number | Number of nanoseconds since Unix epoch | Yes, if `low` and `high` properties are missing | No value |
+| `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+| `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+
+The `low` and `high` properties may be set to either `"-inf"` (negative infinity) or `"+inf"` (positive infinity).
 
 **Example**:
 
@@ -311,33 +421,6 @@ A _timestamp object_ describes a specific point in time.
 {
   "class": "timestamp",
   "value": 1444334398154194201
-}
-```
-
-
-##### Time range object
-
-A _time range object_ describes an interval bounded by two point in
-time.
-
-**Properties**:
-
-| Property | Type | Description | Required? | Default value |
-|---|---|---|---|---|
-| `class` | String | Set to `time-range` | Yes | N/A |
-| `begin` | Number | Beginning timestamp (number of nanoseconds since Unix epoch) | Yes | N/A |
-| `end` | Number | End timestamp (number of nanoseconds since Unix epoch) | Yes | N/A |
-
-The `end` property must have a value greater or equal to the value of
-the `begin` property.
-
-**Examples**:
-
-```json
-{
-  "class": "time-range",
-  "begin": 1444334398154194201,
-  "end": 1444334425194487548
 }
 ```
 
@@ -351,7 +434,11 @@ A _duration object_ describes the difference between two points in time.
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
 | `class` | String | Set to `duration` | Yes | N/A |
-| `value` | Number | Time duration in nanoseconds | Yes | N/A |
+| `value` | Number | Time duration in nanoseconds | Yes, if `low` and `high` properties are missing | No value |
+| `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+| `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+
+The `low` and `high` properties may be set to either `"-inf"` (negative infinity) or `"+inf"` (positive infinity).
 
 **Example**:
 
@@ -359,6 +446,15 @@ A _duration object_ describes the difference between two points in time.
 {
   "class": "duration",
   "value": 917238723
+}
+```
+
+```json
+{
+  "class": "duration",
+  "value": 1928,
+  "low": 1921,
+  "high": 1935
 }
 ```
 
@@ -373,7 +469,11 @@ transfer, etc.
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
 | `class` | String | Set to `size` | Yes | N/A |
-| `value` | Integer | Size in bytes | Yes | N/A |
+| `value` | Number | Size in bytes | Yes, if `low` and `high` properties are missing | No value |
+| `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+| `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+
+The `low` and `high` properties may be set to either `"-inf"` (negative infinity) or `"+inf"` (positive infinity).
 
 **Example**:
 
@@ -394,7 +494,11 @@ A _bitrate object_ describes a transfer rate.
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
 | `class` | String | Set to `bitrate` | Yes | N/A |
-| `value` | Number | Bitrate in bits/second | Yes | N/A |
+| `value` | Number | Bitrate in bits/second | Yes, if `low` and `high` properties are missing | No value |
+| `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+| `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+
+The `low` and `high` properties may be set to either `"-inf"` (negative infinity) or `"+inf"` (positive infinity).
 
 **Example**:
 
@@ -402,6 +506,38 @@ A _bitrate object_ describes a transfer rate.
 {
   "class": "bitrate",
   "value": 9845154
+}
+```
+
+
+##### Time range object
+
+A _time range object_ describes an interval bounded by two point in
+time.
+
+**Properties**:
+
+| Property | Type | Description | Required? | Default value |
+|---|---|---|---|---|
+| `class` | String | Set to `time-range` | Yes | N/A |
+| `begin` | [Timestamp object](#timestamp-object) | Beginning timestamp | Yes | N/A |
+| `end` | [Timestamp object](#timestamp-object) | End timestamp | Yes | N/A |
+
+**Example**:
+
+```json
+{
+  "class": "time-range",
+  "begin": {
+    "class": "timestamp",
+    "value": 1444334398154194201
+  },
+  "end": {
+    "class": "timestamp",
+    "low": 1444334425194487548,
+    "value": 1444334425194487548,
+    "high": "+inf"
+  }
 }
 ```
 
@@ -628,8 +764,8 @@ A _column description object_ describes one table _column_.
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
 | `title` | String | Column's title | No | No title |
-| `class` | String | Class of data in column's cells, amongst: <ul><li>`string`: JSON strings</li><li>`int`: JSON numbers limited to integers</li><li>`number`: JSON numbers</li><li>`bool`: JSON booleans</li><li>`ratio`: [ratio objects](#ratio-object)</li><li>`timestamp`: [timestamp objects](#timestamp-object)</li><li>`time-range`: [time range objects](#time-range-object)</li><li>`duration`: [duration objects](#duration-object)</li><li>`size`: [size objects](#size-object)</li><li>`bitrate`: [bitrate objects](#bitrate-object)</li><li>`syscall`: [syscall objects](#syscall-object)</li><li>`process`: [process objects](#process-object)</li><li>`path`: [path objects](#path-object)</li><li>`fd`: [file descriptor objects](#file-descriptor-object)</li><li>`irq`: [IRQ objects](#irq-object)</li><li>`cpu`: [CPU objects](#cpu-object)</li><li>`disk`: [disk objects](#disk-object)</li><li>`part`: [disk partition objects](#disk-partition-object)</li><li>`netif`: [network interface objects](#network-interface-object)</li><li>`mixed`: any object</li></ul> | No | `mixed` |
-| `unit` | String | Column's unit, if the `class` property is `string`, `int`, `number`, or `bool` | No | No unit |
+| `class` | String | Class of data in column's cells, amongst: <ul><li>`bool`: [boolean objects](#boolean-object)</li><li>`number`: [number objects](#number-object)</li><li>`string`: [string objects](#string-object)</li><li>`ratio`: [ratio objects](#ratio-object)</li><li>`timestamp`: [timestamp objects](#timestamp-object)</li><li>`duration`: [duration objects](#duration-object)</li><li>`size`: [size objects](#size-object)</li><li>`bitrate`: [bitrate objects](#bitrate-object)</li><li>`time-range`: [time range objects](#time-range-object)</li><li>`syscall`: [syscall objects](#syscall-object)</li><li>`process`: [process objects](#process-object)</li><li>`path`: [path objects](#path-object)</li><li>`fd`: [file descriptor objects](#file-descriptor-object)</li><li>`irq`: [IRQ objects](#irq-object)</li><li>`cpu`: [CPU objects](#cpu-object)</li><li>`disk`: [disk objects](#disk-object)</li><li>`part`: [disk partition objects](#disk-partition-object)</li><li>`netif`: [network interface objects](#network-interface-object)</li><li>`mixed`: any object</li></ul> | No | `mixed` |
+| `unit` | String | Column's unit, if the `class` property is `number` | No | No unit |
 
 **Examples**:
 
@@ -643,7 +779,7 @@ A _column description object_ describes one table _column_.
 ```json
 {
   "title": "Count",
-  "class": "int",
+  "class": "number",
   "unit": "interrupts"
 }
 ```
@@ -678,7 +814,7 @@ inherited values.
     },
     {
       "title": "Count",
-      "class": "int",
+      "class": "number",
       "unit": "interrupts"
     },
     {
@@ -788,7 +924,7 @@ dynamic result tables.
       "title": "System calls latency statistics",
       "column-descriptions": [
         {"title": "System call", "class": "syscall"},
-        {"title": "Count", "class": "int", "unit": "operations"},
+        {"title": "Count", "class": "number", "unit": "operations"},
         {"title": "Minimum duration", "class": "duration"},
         {"title": "Average duration", "class": "duration"},
         {"title": "Maximum duration", "class": "duration"},
@@ -799,7 +935,7 @@ dynamic result tables.
       "title": "Disk latency statistics",
       "column-descriptions": [
         {"title": "Disk name", "class": "disk"},
-        {"title": "Count", "class": "int", "unit": "operations"},
+        {"title": "Count", "class": "number", "unit": "operations"},
         {"title": "Minimum duration", "class": "duration"},
         {"title": "Average duration", "class": "duration"},
         {"title": "Maximum duration", "class": "duration"},
@@ -938,14 +1074,20 @@ Any column cell may contain `null` when the cell is **empty**.
 {
   "time-range": {
     "class": "time-range",
-    "begin": 1444334398154194201,
-    "end": 1444334425194487548
+    "begin": {
+      "class": "timestamp",
+      "value": 1444334398154194201
+    },
+    "end": {
+      "class": "timestamp",
+      "value": 1444334425194487548
+    }
   },
   "class": "syscall-latency",
   "data": [
     [
       {"class": "syscall", "name": "open"},
-      45,
+      {"class": "number", "value": 23},
       {"class": "duration", "value": 5562},
       {"class": "duration", "value": 13835},
       {"class": "duration", "value": 77683},
@@ -953,7 +1095,7 @@ Any column cell may contain `null` when the cell is **empty**.
     ],
     [
       {"class": "syscall", "name": "read"},
-      109,
+      {"class": "number", "value": 109},
       {"class": "duration", "value": 316},
       {"class": "duration", "value": 5774},
       {"class": "unknown"},
@@ -969,8 +1111,14 @@ Any column cell may contain `null` when the cell is **empty**.
 {
   "time-range": {
     "class": "time-range",
-    "begin": 1444334398154194201,
-    "end": 1444334425194487548
+    "begin": {
+      "class": "timestamp",
+      "value": 1444334398154194201
+    },
+    "end": {
+      "class": "timestamp",
+      "value": 1444334425194487548
+    }
   },
   "class": {
     "inherit": "some-latency",
@@ -979,7 +1127,7 @@ Any column cell may contain `null` when the cell is **empty**.
   "data": [
     [
       {"class": "syscall", "name": "open"},
-      45,
+      {"class": "number", "value": 45},
       {"class": "duration", "value": 5562},
       {"class": "duration", "value": 13835},
       {"class": "duration", "value": 77683},
@@ -987,7 +1135,7 @@ Any column cell may contain `null` when the cell is **empty**.
     ],
     [
       {"class": "syscall", "name": "read"},
-      109,
+      {"class": "number", "value": 109},
       {"class": "duration", "value": 316},
       {"class": "duration", "value": 5774},
       {"class": "unknown"},
@@ -1003,8 +1151,14 @@ Any column cell may contain `null` when the cell is **empty**.
 {
   "time-range": {
     "class": "time-range",
-    "begin": 1444334398154194201,
-    "end": 1444334425194487548
+    "begin": {
+      "class": "timestamp",
+      "value": 1444334398154194201
+    },
+    "end": {
+      "class": "timestamp",
+      "value": 1444334425194487548
+    }
   },
   "class": {
     "title": "System call stuff for process zsh [4723]",
@@ -1015,15 +1169,15 @@ Any column cell may contain `null` when the cell is **empty**.
       },
       {
         "title": "Count in region AX:23",
-        "class": "int"
+        "class": "number"
       },
       {
         "title": "Count in region BC:86",
-        "class": "int"
+        "class": "number"
       },
       {
         "title": "Count in region HE:37",
-        "class": "int"
+        "class": "number"
       }
     ]
   },
@@ -1033,18 +1187,18 @@ Any column cell may contain `null` when the cell is **empty**.
         "class": "syscall",
         "name": "read"
       },
-      19,
-      155,
-      2
+      {"class": "number", "value": 19},
+      {"class": "number", "value": 155},
+      {"class": "number", "value": 2}
     ],
     [
       {
         "class": "syscall",
         "name": "write"
       },
-      45,
-      192,
-      17
+      {"class": "number", "value": 45},
+      {"class": "number", "value": 192},
+      {"class": "number", "value": 17}
     ]
   ]
 }
@@ -1070,14 +1224,20 @@ analysis.
     {
       "time-range": {
         "class": "time-range",
-        "begin": 1444334398154194201,
-        "end": 1444334425194487548
+        "begin": {
+          "class": "timestamp",
+          "value": 1444334398154194201
+        },
+        "end": {
+          "class": "timestamp",
+          "value": 1444334425194487548
+        }
       },
       "class": "syscall-latency",
       "data": [
         [
           {"class": "syscall", "name": "open"},
-          45,
+          {"class": "number", "value": 45},
           {"class": "duration", "value": 5562},
           {"class": "duration", "value": 13835},
           {"class": "duration", "value": 77683},
@@ -1085,7 +1245,7 @@ analysis.
         ],
         [
           {"class": "syscall", "name": "read"},
-          109,
+          {"class": "number", "value": 109},
           {"class": "duration", "value": 316},
           {"class": "duration", "value": 5774},
           {"class": "unknown"},
@@ -1096,14 +1256,20 @@ analysis.
     {
       "time-range": {
         "class": "time-range",
-        "begin": 1444334425194487549,
-        "end": 1444334425254887190
+        "begin": {
+          "class": "timestamp",
+          "value": 1444334425194487549,
+        },
+        "end": {
+          "class": "timestamp",
+          "value": 1444334425254887190
+        }
       },
       "class": "syscall-latency",
       "data": [
         [
           {"class": "syscall", "name": "open"},
-          45,
+          {"class": "number", "value": 45},
           {"class": "duration", "value": 1578},
           {"class": "duration", "value": 16648},
           {"class": "duration", "value": 15444},
@@ -1111,7 +1277,7 @@ analysis.
         ],
         [
           {"class": "syscall", "name": "read"},
-          109,
+          {"class": "number", "value": 109},
           {"class": "duration", "value": 78},
           {"class": "duration", "value": 1948},
           {"class": "duration", "value": 11184},
