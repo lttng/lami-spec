@@ -268,7 +268,7 @@ produce a result for some reason.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `unknown` | Yes | |
+| `class` | String | Set to `"unknown"` | Yes | |
 
 **Example**:
 
@@ -287,7 +287,7 @@ A _boolean object_ represents a boolean value.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `bool` | Yes | |
+| `class` | String | Set to `"bool"` | Yes | |
 | `value` | Boolean | Value | Yes | |
 
 **Example**:
@@ -308,7 +308,7 @@ A _number object_ represents a number.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `number` | Yes | |
+| `class` | String | Set to `"number"` | Yes | |
 | `value` | Number | Value | Yes, if `low` and `high` properties are missing | No value |
 | `low` | Number or string | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 | `high` | Number or string | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
@@ -357,7 +357,7 @@ A _string object_ represents a string value.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `string` | Yes | |
+| `class` | String | Set to `"string"` | Yes | |
 | `value` | String | Value | Yes | |
 
 **Example**:
@@ -382,7 +382,7 @@ It is suggested that the consumer shows a ratio object as a percentage.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `ratio` | Yes | |
+| `class` | String | Set to `"ratio"` | Yes | |
 | `value` | Number | Ratio as a decimal fraction | Yes, if `low` and `high` properties are missing | No value |
 | `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 | `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
@@ -415,7 +415,7 @@ A _timestamp object_ describes a specific point in time.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `timestamp` | Yes | |
+| `class` | String | Set to `"timestamp"` | Yes | |
 | `value` | Number | Number of nanoseconds since Unix epoch | Yes, if `low` and `high` properties are missing | No value |
 | `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 | `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
@@ -440,7 +440,7 @@ A _duration object_ describes the difference between two points in time.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `duration` | Yes | |
+| `class` | String | Set to `"duration"` | Yes | |
 | `value` | Number | Time duration in nanoseconds | Yes, if `low` and `high` properties are missing | No value |
 | `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 | `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
@@ -475,7 +475,7 @@ transfer, etc.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `size` | Yes | |
+| `class` | String | Set to `"size"` | Yes | |
 | `value` | Number | Size in bytes | Yes, if `low` and `high` properties are missing | No value |
 | `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 | `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
@@ -500,7 +500,7 @@ A _bitrate object_ describes a transfer rate.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `bitrate` | Yes | |
+| `class` | String | Set to `"bitrate"` | Yes | |
 | `value` | Number | Bitrate in bits/second | Yes, if `low` and `high` properties are missing | No value |
 | `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 | `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
@@ -526,7 +526,7 @@ time.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `time-range` | Yes | |
+| `class` | String | Set to `"time-range"` | Yes | |
 | `begin` | [Timestamp object](#timestamp-object) | Beginning timestamp | Yes | |
 | `end` | [Timestamp object](#timestamp-object) | End timestamp | Yes | |
 
@@ -557,7 +557,7 @@ A _syscall object_ describes the name of a system call.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `syscall` | Yes | |
+| `class` | String | Set to `"syscall"` | Yes | |
 | `name` | String | System call name | Yes | |
 
 **Example**:
@@ -578,7 +578,7 @@ A _process object_ describes a system process.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `process` | Yes | |
+| `class` | String | Set to `"process"` | Yes | |
 | `name` | String | Process name | No | No process name |
 | `pid` | Integer | Process ID (PID) | No | No process ID |
 | `tid` | Integer | Thread ID (TID) | No | No thread ID |
@@ -603,7 +603,7 @@ A _path object_ describes a relative or absolute file system path.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `path` | Yes | |
+| `class` | String | Set to `"path"` | Yes | |
 | `path` | String | File system path | Yes | |
 
 **Example**:
@@ -624,7 +624,7 @@ A _file descriptor object_ describes the numeric descriptor of a file.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `fd` | Yes | |
+| `class` | String | Set to `"fd"` | Yes | |
 | `fd` | Integer | File descriptor | Yes | |
 
 **Example**:
@@ -645,7 +645,7 @@ An _IRQ object_ describes an interrupt source.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `irq` | Yes | |
+| `class` | String | Set to `"irq"` | Yes | |
 | `hard` | Boolean | `true` if this interrupt source generates hardware interrupts, `false` for software interrupts | No | `true` |
 | `nr` | Integer | Interrupt source number | Yes | |
 | `name` | String | Interrupt source name | No | No interrupt source name |
@@ -670,7 +670,7 @@ A _CPU object_ describes a numeric CPU identifier.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `cpu` | Yes | |
+| `class` | String | Set to `"cpu"` | Yes | |
 | `id` | Integer | CPU identifier number | Yes | |
 
 **Example**:
@@ -691,7 +691,7 @@ A _disk object_ describes a disk name.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `disk` | Yes | |
+| `class` | String | Set to `"disk"` | Yes | |
 | `name` | String | Disk name | Yes | |
 
 **Example**:
@@ -712,7 +712,7 @@ A _disk partition object_ describes a disk partition name.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `part` | Yes | |
+| `class` | String | Set to `"part"` | Yes | |
 | `name` | String | Disk partition name | Yes | |
 
 **Example**:
@@ -733,7 +733,7 @@ A _network interface object_ describes a network interface name.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `netif` | Yes | |
+| `class` | String | Set to `"netif"` | Yes | |
 | `name` | String | Network interface name | Yes | |
 
 **Example**:
@@ -771,7 +771,7 @@ A _column description object_ describes one table _column_.
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
 | `title` | String | Column's title | No | No title |
-| `class` | String | Class of data in column's cells, amongst: <ul><li>`bool`: [boolean objects](#boolean-object)</li><li>`number`: [number objects](#number-object)</li><li>`string`: [string objects](#string-object)</li><li>`ratio`: [ratio objects](#ratio-object)</li><li>`timestamp`: [timestamp objects](#timestamp-object)</li><li>`duration`: [duration objects](#duration-object)</li><li>`size`: [size objects](#size-object)</li><li>`bitrate`: [bitrate objects](#bitrate-object)</li><li>`time-range`: [time range objects](#time-range-object)</li><li>`syscall`: [syscall objects](#syscall-object)</li><li>`process`: [process objects](#process-object)</li><li>`path`: [path objects](#path-object)</li><li>`fd`: [file descriptor objects](#file-descriptor-object)</li><li>`irq`: [IRQ objects](#irq-object)</li><li>`cpu`: [CPU objects](#cpu-object)</li><li>`disk`: [disk objects](#disk-object)</li><li>`part`: [disk partition objects](#disk-partition-object)</li><li>`netif`: [network interface objects](#network-interface-object)</li><li>`mixed`: any object</li></ul> | No | `mixed` |
+| `class` | String | Class of data in column's cells, amongst: <ul><li>`"bool"`: [boolean objects](#boolean-object)</li><li>`"number"`: [number objects](#number-object)</li><li>`"string"`: [string objects](#string-object)</li><li>`"ratio"`: [ratio objects](#ratio-object)</li><li>`"timestamp"`: [timestamp objects](#timestamp-object)</li><li>`"duration"`: [duration objects](#duration-object)</li><li>`"size"`: [size objects](#size-object)</li><li>`"bitrate"`: [bitrate objects](#bitrate-object)</li><li>`"time-range"`: [time range objects](#time-range-object)</li><li>`"syscall"`: [syscall objects](#syscall-object)</li><li>`"process"`: [process objects](#process-object)</li><li>`"path"`: [path objects](#path-object)</li><li>`fd`: [file descriptor objects](#file-descriptor-object)</li><li>`"irq"`: [IRQ objects](#irq-object)</li><li>`"cpu"`: [CPU objects](#cpu-object)</li><li>`"disk"`: [disk objects](#disk-object)</li><li>`"part"`: [disk partition objects](#disk-partition-object)</li><li>`"netif"`: [network interface objects](#network-interface-object)</li><li>`mixed`: any object</li></ul> | No | `mixed` |
 | `unit` | String | Column's unit, if the `class` property is `number` | No | No unit |
 
 **Examples**:
@@ -864,7 +864,7 @@ column descriptions):
 | `major` | Integer | Major version | Yes, if `minor` exists | No major version |
 | `minor` | Integer | Minor version | Yes, if `patch` exists | No minor version |
 | `patch` | Integer | Patch version | No | No patch version |
-| `extra` | String | Extra version information (e.g., `dev`, `pre`, `rc2`, commit ID) | No | No extra version |
+| `extra` | String | Extra version information (e.g., `"dev"`, `"pre"`, `"rc2"`, commit ID) | No | No extra version |
 
 **Example**:
 
