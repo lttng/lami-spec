@@ -102,26 +102,26 @@ The LAMI input format is a list of standard command-line arguments.
 
 | Argument | Description | Required? | Default |
 |---|---|---|---|
-| `--mi-version` | Output the LAMI version produced by this analysis | Yes | N/A |
+| `--mi-version` | Output the LAMI version produced by this analysis | Yes | |
 
 **Metadata phase**:
 
 | Argument | Description | Required? | Default |
 |---|---|---|---|
-| `--metadata` | Output the analysis' metadata instead of analyzing | Yes | N/A |
+| `--metadata` | Output the analysis' metadata instead of analyzing | Yes | |
 
 **Compatibility test phase**:
 
 | Argument | Description | Required? | Default |
 |---|---|---|---|
-| 1st positional | Path to trace(s) to analyze | Yes | N/A |
-| `--test-compatibility` | Test whether or not the given trace can be analyzed | Yes | N/A |
+| 1st positional | Path to trace(s) to analyze | Yes | |
+| `--test-compatibility` | Test whether or not the given trace can be analyzed | Yes | |
 
 **Results phase**:
 
 | Argument | Description | Required? | Default |
 |---|---|---|---|
-| 1st positional | Path to trace(s) to analyze | Yes | N/A |
+| 1st positional | Path to trace(s) to analyze | Yes | |
 | `--begin=TS` | Set beginning timestamp of analysis to `TS` ns | No | Absolute beginning of the analyzed traces |
 | `--end=TS` | Set end timestamp of analysis to `TS` ns | No | Absolute end of the analyzed traces |
 | `--limit=COUNT` | Set maximum number of output rows per result table to `COUNT` (use `unlimited` for no maximum number of rows) | No | `unlimited` |
@@ -212,7 +212,7 @@ during its execution.
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
 | `error-code` | String or number | Error code | No | No error code |
-| `error-message` | String | Error message | Yes | N/A |
+| `error-message` | String | Error message | Yes | |
 
 
 **Example**:
@@ -268,7 +268,7 @@ produce a result for some reason.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `unknown` | Yes | N/A |
+| `class` | String | Set to `unknown` | Yes | |
 
 **Example**:
 
@@ -287,8 +287,8 @@ A _boolean object_ represents a boolean value.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `bool` | Yes | N/A |
-| `value` | Boolean | Value | Yes | N/A |
+| `class` | String | Set to `bool` | Yes | |
+| `value` | Boolean | Value | Yes | |
 
 **Example**:
 
@@ -308,7 +308,7 @@ A _number object_ represents a number.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `number` | Yes | N/A |
+| `class` | String | Set to `number` | Yes | |
 | `value` | Number | Value | Yes, if `low` and `high` properties are missing | No value |
 | `low` | Number or string | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 | `high` | Number or string | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
@@ -357,8 +357,8 @@ A _string object_ represents a string value.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `string` | Yes | N/A |
-| `value` | String | Value | Yes | N/A |
+| `class` | String | Set to `string` | Yes | |
+| `value` | String | Value | Yes | |
 
 **Example**:
 
@@ -382,7 +382,7 @@ It is suggested that the consumer shows a ratio object as a percentage.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `ratio` | Yes | N/A |
+| `class` | String | Set to `ratio` | Yes | |
 | `value` | Number | Ratio as a decimal fraction | Yes, if `low` and `high` properties are missing | No value |
 | `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 | `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
@@ -415,7 +415,7 @@ A _timestamp object_ describes a specific point in time.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `timestamp` | Yes | N/A |
+| `class` | String | Set to `timestamp` | Yes | |
 | `value` | Number | Number of nanoseconds since Unix epoch | Yes, if `low` and `high` properties are missing | No value |
 | `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 | `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
@@ -440,7 +440,7 @@ A _duration object_ describes the difference between two points in time.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `duration` | Yes | N/A |
+| `class` | String | Set to `duration` | Yes | |
 | `value` | Number | Time duration in nanoseconds | Yes, if `low` and `high` properties are missing | No value |
 | `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 | `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
@@ -475,7 +475,7 @@ transfer, etc.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `size` | Yes | N/A |
+| `class` | String | Set to `size` | Yes | |
 | `value` | Number | Size in bytes | Yes, if `low` and `high` properties are missing | No value |
 | `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 | `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
@@ -500,7 +500,7 @@ A _bitrate object_ describes a transfer rate.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `bitrate` | Yes | N/A |
+| `class` | String | Set to `bitrate` | Yes | |
 | `value` | Number | Bitrate in bits/second | Yes, if `low` and `high` properties are missing | No value |
 | `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 | `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
@@ -526,9 +526,9 @@ time.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `time-range` | Yes | N/A |
-| `begin` | [Timestamp object](#timestamp-object) | Beginning timestamp | Yes | N/A |
-| `end` | [Timestamp object](#timestamp-object) | End timestamp | Yes | N/A |
+| `class` | String | Set to `time-range` | Yes | |
+| `begin` | [Timestamp object](#timestamp-object) | Beginning timestamp | Yes | |
+| `end` | [Timestamp object](#timestamp-object) | End timestamp | Yes | |
 
 **Example**:
 
@@ -557,8 +557,8 @@ A _syscall object_ describes the name of a system call.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `syscall` | Yes | N/A |
-| `name` | String | System call name | Yes | N/A |
+| `class` | String | Set to `syscall` | Yes | |
+| `name` | String | System call name | Yes | |
 
 **Example**:
 
@@ -578,7 +578,7 @@ A _process object_ describes a system process.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `process` | Yes | N/A |
+| `class` | String | Set to `process` | Yes | |
 | `name` | String | Process name | No | No process name |
 | `pid` | Integer | Process ID (PID) | No | No process ID |
 | `tid` | Integer | Thread ID (TID) | No | No thread ID |
@@ -603,8 +603,8 @@ A _path object_ describes a relative or absolute file system path.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `path` | Yes | N/A |
-| `path` | String | File system path | Yes | N/A |
+| `class` | String | Set to `path` | Yes | |
+| `path` | String | File system path | Yes | |
 
 **Example**:
 
@@ -624,8 +624,8 @@ A _file descriptor object_ describes the numeric descriptor of a file.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `fd` | Yes | N/A |
-| `fd` | Integer | File descriptor | Yes | N/A |
+| `class` | String | Set to `fd` | Yes | |
+| `fd` | Integer | File descriptor | Yes | |
 
 **Example**:
 
@@ -645,9 +645,9 @@ An _IRQ object_ describes an interrupt source.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `irq` | Yes | N/A |
+| `class` | String | Set to `irq` | Yes | |
 | `hard` | Boolean | `true` if this interrupt source generates hardware interrupts, `false` for software interrupts | No | `true` |
-| `nr` | Integer | Interrupt source number | Yes | N/A |
+| `nr` | Integer | Interrupt source number | Yes | |
 | `name` | String | Interrupt source name | No | No interrupt source name |
 
 **Example**:
@@ -670,8 +670,8 @@ A _CPU object_ describes a numeric CPU identifier.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `cpu` | Yes | N/A |
-| `id` | Integer | CPU identifier number | Yes | N/A |
+| `class` | String | Set to `cpu` | Yes | |
+| `id` | Integer | CPU identifier number | Yes | |
 
 **Example**:
 
@@ -691,8 +691,8 @@ A _disk object_ describes a disk name.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `disk` | Yes | N/A |
-| `name` | String | Disk name | Yes | N/A |
+| `class` | String | Set to `disk` | Yes | |
+| `name` | String | Disk name | Yes | |
 
 **Example**:
 
@@ -712,8 +712,8 @@ A _disk partition object_ describes a disk partition name.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `part` | Yes | N/A |
-| `name` | String | Disk partition name | Yes | N/A |
+| `class` | String | Set to `part` | Yes | |
+| `name` | String | Disk partition name | Yes | |
 
 **Example**:
 
@@ -733,8 +733,8 @@ A _network interface object_ describes a network interface name.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `class` | String | Set to `netif` | Yes | N/A |
-| `name` | String | Network interface name | Yes | N/A |
+| `class` | String | Set to `netif` | Yes | |
+| `name` | String | Network interface name | Yes | |
 
 **Example**:
 
@@ -884,14 +884,14 @@ column descriptions):
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `mi-version` | [Version object](#version-object) | Latest version of the LAMI standard supported by this analysis, amongst:<ul><li>`{"major": 0, "minor": 1}`</li></ul> | Yes | N/A |
+| `mi-version` | [Version object](#version-object) | Latest version of the LAMI standard supported by this analysis, amongst:<ul><li>`{"major": 0, "minor": 1}`</li></ul> | Yes | |
 | `version` | [Version object](#version-object) | Version of the analysis | No | No version |
 | `title` | String | Analysis title | No | No title |
 | `authors` | Array of strings | Author(s) of the analysis | No | No authors |
 | `description` | String | Analysis description | No | No description |
 | `url` | String | URL where to find the analysis | No | No URL |
 | `tags` | Array of strings | List of tags associated with the analysis | No | No tags |
-| `table-classes` | Object mapping table class names (strings) to [table class objects](#table-class-object) | Classes of potential result tables | Yes (at least one table class) | N/A |
+| `table-classes` | Object mapping table class names (strings) to [table class objects](#table-class-object) | Classes of potential result tables | Yes (at least one table class) | |
 
 The `table-classes` property describes all the potential result
 tables with a static layout that can be generated by the
@@ -1050,9 +1050,9 @@ columns.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `time-range` | [Time range object](#time-range-object) | Time range over which the results contained in this table apply | Yes | N/A |
-| `class` | String or [table class object](#table-class-object) | Table class name or table class object containing the metadata of this result table | Yes | N/A |
-| `data` | Array of arrays of [data objects](#data-objects)/plain JSON values | Result table rows | Yes (at least one row) | N/A |
+| `time-range` | [Time range object](#time-range-object) | Time range over which the results contained in this table apply | Yes | |
+| `class` | String or [table class object](#table-class-object) | Table class name or table class object containing the metadata of this result table | Yes | |
+| `data` | Array of arrays of [data objects](#data-objects)/plain JSON values | Result table rows | Yes (at least one row) | |
 
 The `class` property indicates either:
 
@@ -1221,7 +1221,7 @@ analysis.
 
 | Property | Type | Description | Required? | Default value |
 |---|---|---|---|---|
-| `results` | Array of [result table objects](#result-table-object) | Analysis results tables | Yes (at least one table) | N/A |
+| `results` | Array of [result table objects](#result-table-object) | Analysis results tables | Yes (at least one table) | |
 
 **Example**:
 
