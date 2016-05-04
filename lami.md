@@ -10,14 +10,21 @@ of those analyses. Each script is responsible for one analysis.
 
 ## Definitions
 
-  * **Analysis**: A producer of LAMI. An analysis is a program which
-    receives an input following the LAMI [input format](#input-format),
-    performs an analysis on a set of traces, and prints the results
-    following the LAMI [output format](#output-format).
-  * **Consumer**: A consumer of LAMI. A consumer, usually some sort of
-    user interface, executes an analysis program following the LAMI
-    input format, and receives its results, following the LAMI output
-    format.
+<dl>
+<dt>Analysis</dt>
+<dd>A producer of LAMI. An analysis is a program which
+receives an input following the LAMI
+<a href="#input-format">input format</a>,
+performs an analysis on a set of traces, and prints the results
+following the LAMI
+<a href="#output-format">output format</a>.</dd>
+
+<dt>Consumer</dt>
+<dd>A consumer of LAMI. A consumer, usually some sort of
+user interface, executes an analysis program following the LAMI
+input format, and receives its results, following the LAMI output
+format.</dd>
+</dl>
 
 
 ## Version semantics
