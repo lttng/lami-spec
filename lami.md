@@ -310,8 +310,8 @@ A _number object_ represents a number.
 |---|---|---|---|---|
 | `class` | String | Set to `"number"` | Yes | |
 | `value` | Number | Value | Yes, if `low` and `high` properties are missing | No value |
-| `low` | Number or string | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
-| `high` | Number or string | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+| `low` | Number or string | Lower bound (included) of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+| `high` | Number or string | Higher bound (included) of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 
 The `low` and `high` properties may be set to either `"-inf"` (negative infinity) or `"+inf"` (positive infinity).
 
@@ -384,8 +384,8 @@ It is suggested that the consumer shows a ratio object as a percentage.
 |---|---|---|---|---|
 | `class` | String | Set to `"ratio"` | Yes | |
 | `value` | Number | Ratio as a decimal fraction | Yes, if `low` and `high` properties are missing | No value |
-| `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
-| `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+| `low` | Number | Lower bound (included) of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+| `high` | Number | Higher bound (included) of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 
 The `low` and `high` properties may be set to either `"-inf"` (negative infinity) or `"+inf"` (positive infinity).
 
@@ -417,8 +417,8 @@ A _timestamp object_ describes a specific point in time.
 |---|---|---|---|---|
 | `class` | String | Set to `"timestamp"` | Yes | |
 | `value` | Number | Number of nanoseconds since Unix epoch | Yes, if `low` and `high` properties are missing | No value |
-| `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
-| `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+| `low` | Number | Lower bound (included) of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+| `high` | Number | Higher bound (included) of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 
 The `low` and `high` properties may be set to either `"-inf"` (negative infinity) or `"+inf"` (positive infinity).
 
@@ -442,8 +442,8 @@ A _duration object_ describes the difference between two points in time.
 |---|---|---|---|---|
 | `class` | String | Set to `"duration"` | Yes | |
 | `value` | Number | Time duration in nanoseconds | Yes, if `low` and `high` properties are missing | No value |
-| `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
-| `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+| `low` | Number | Lower bound (included) of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+| `high` | Number | Higher bound (included) of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 
 The `low` and `high` properties may be set to either `"-inf"` (negative infinity) or `"+inf"` (positive infinity).
 
@@ -477,8 +477,8 @@ transfer, etc.
 |---|---|---|---|---|
 | `class` | String | Set to `"size"` | Yes | |
 | `value` | Number | Size in bytes | Yes, if `low` and `high` properties are missing | No value |
-| `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
-| `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+| `low` | Number | Lower bound (included) of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+| `high` | Number | Higher bound (included) of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 
 The `low` and `high` properties may be set to either `"-inf"` (negative infinity) or `"+inf"` (positive infinity).
 
@@ -502,8 +502,8 @@ A _bitrate object_ describes a transfer rate.
 |---|---|---|---|---|
 | `class` | String | Set to `"bitrate"` | Yes | |
 | `value` | Number | Bitrate in bits/second | Yes, if `low` and `high` properties are missing | No value |
-| `low` | Number | Lower bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
-| `high` | Number | Higher bound of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+| `low` | Number | Lower bound (included) of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
+| `high` | Number | Higher bound (included) of the interval of values in which the value can be said to lie in | Yes, if the `value` property is missing | The value of the `value` property |
 
 The `low` and `high` properties may be set to either `"-inf"` (negative infinity) or `"+inf"` (positive infinity).
 
