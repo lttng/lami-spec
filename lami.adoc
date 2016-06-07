@@ -314,7 +314,7 @@ A _boolean object_ represents a boolean value.
 .Properties of a boolean object
 |====
 |Property |Type |Description |Required? |Default value
-|`class` |String |Set to `"bool"` |Yes
+|`class` |String |Set to `"bool"` |Yes |
 |`value` |Boolean |Value | Yes |
 |====
 
