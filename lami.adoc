@@ -1,7 +1,7 @@
 LTTng analyses machine interface (LAMI)
 =======================================
 Philippe Proulx <pproulx@efficios.com>
-v1.0.0
+v1.0.1
 
 This document explains the input and output formats of the **LTTng
 analyses's machine interface** (LAMI), version 1.0.
