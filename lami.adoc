@@ -1,0 +1,1677 @@
+LTTng analyses machine interface (LAMI)
+=======================================
+Philippe Proulx <pproulx@efficios.com>
+v1.0.0
+
+This document explains the input and output formats of the **LTTng
+analyses's machine interface** (LAMI), version 1.0.
+
+The https://github.com/lttng/lttng-analyses[LTTng analyses] project is
+a set of scripts which analyze one or more traces and print the results
+of those analyses. Each script is responsible for one analysis.
+
+
+[[definitions]]
+== Definitions
+
+Analysis::
+  A producer of LAMI.
++
+An analysis is a program which receives an input
+following the LAMI <<input-format,input format>>, performs an
+analysis on a set of traces, and prints the results following the LAMI
+<<output-format,output format>>.
+
+Consumer::
+  A consumer of LAMI.
++
+A consumer, usually some sort of user interface, executes an analysis
+program following the LAMI input format, and receives its results,
+following the LAMI output format.
+
+
+[[version-semantics]]
+== Version semantics
+
+Each LAMI specification has a major and a minor version number.
+
+A **major** version bump allows:
+
+* Everything that a minor bump allows (see below).
+* _Input_:
+** The semantics of existing command-line arguments to be modified.
+** Mandatory command-line arguments to be removed.
+** Mandatory command-line arguments to be added.
+** Mandatory command-line arguments to be made optional.
+** Input format to be changed from command-line arguments to
+   something else.
+* _Output_:
+** The semantics of existing JSON properties to be modified.
+** JSON properties to be removed.
+** Mandatory JSON properties to be added.
+** Mandatory JSON properties to be made optional.
+** Output format to be changed from JSON and progress indication
+   lines to something else.
+
+A **minor** version bump allows:
+
+* _Input_:
+** Optional command-line arguments to be added.
+* _Output_:
+** Optional JSON properties to be added.
+** <<data-objects,Data object>> classes to be added.
+
+As such, a consumer executing an analysis which states a production of
+LAMI with a minor version greater than the one the consumer supports,
+as long as the major version is supported, should be aware that:
+
+* Important data could me missing from the metadata and results, as
+  JSON properties can be added with a minor version bump.
+* Unknown data object classes could be encountered, in which case the
+  consumer does not know what they represent, nor how to render them.
+
+It is recommended for the consumer to show the user a warning message
+when an unexpected JSON property or data object class is found. The
+known data objects can still be interpreted, however.
+
+A consumer not supporting the major version of LAMI that the analysis
+produces should not attempt other interactions with the
+analysis.
+
+
+[[input-format]]
+== Input format
+
+A consumer executes an analysis program with one or more standard
+command-line arguments, then reads the standard output of the analysis
+to read its metadata or results following the <<output-format,output
+format>>.
+
+There are four different phases of analysis execution:
+
+. **LAMI version phase**: The consumer obtains the version of
+  LAMI that the analysis produces.
+. **Metadata phase**: The consumer obtains the static metadata of
+  the analysis.
+. **Compatibility test phase**: The consumer queries the analysis
+  with a specific trace, and the analysis indicates if this trace
+  can be analyzed.
+. **Results phase**: The consumer can perform as many analyses as
+  needed on different time ranges and set of traces, using the
+  metadata of step 1 to interpret the results.
+
+Having two separate phases for the metadata and results parts avoids
+attaching the same metadata to each result of a given analysis.
+
+The LAMI input format is a list of standard command-line arguments.
+
+=== LAMI version phase
+
+.LAMI version phase command-line arguments
+|====
+|Argument |Description |Required? |Default
+|`--mi-version` |Output the LAMI version produced by this analysis |Yes |
+|====
+
+
+=== Metadata phase
+
+.Metadata phase command-line arguments
+|====
+|Argument |Description |Required? |Default
+|`--metadata` |Output the analysis's metadata instead of analyzing |Yes |
+|====
+
+
+=== Compatibility test phase
+
+.Compatibility test phase command-line arguments
+|====
+|Argument |Description |Required? |Default
+|1st positional |Path to trace(s) to analyze |Yes |
+|`--test-compatibility` |Test whether or not the given trace can be analyzed |Yes |
+|====
+
+
+=== Results phase
+
+.Results phase command-line arguments
+|====
+|Argument |Description |Required? |Default
+|1st positional |Path to trace(s) to analyze |Yes |
+|+--begin=__TS__+ |Set beginning timestamp of analysis to +__TS__+ ns |No |Absolute beginning of the analyzed traces
+|+--end=__TS__+ |Set end timestamp of analysis to +__TS__+ ns |No |Absolute end of the analyzed traces
+|+--limit=__COUNT__+ |Set maximum number of output rows per result table to +__COUNT__+ (use `unlimited` for no maximum number of rows) |No |`unlimited`
+|`--output-progress` |Output <<progress,progress data>> before outputting the results |No |No progress indication
+|====
+
+
+[[output-format]]
+== Output format
+
+The LAMI output format is produced by the analysis and is consumed by
+the consumer.
+
+
+=== Overview
+
+An analysis has two output channels:
+
+. Its **standard output**, which contains progress data, a metadata
+  object, an analysis result object, or an error object.
+. Its **exit status**, which indicates if the analysis was successful
+  or not.
+
+If an analysis is successful, its exit status is set to 0. Otherwise,
+it's set to non-zero.
+
+
+==== LAMI version phase
+
+During the _LAMI version phase_, the analysis prints a single line of
+plain text, possibly terminated by a Unix newline (ASCII LF), following
+this format:
+
+    MAJOR.MINOR
+
+where `MAJOR` is the decimal major version number and `MINOR` is the
+decimal minor version number of the LAMI produced by the analysis.
+
+See: <<version-semantics,Version semantics>>.
+
+
+==== Metadata phase
+
+During the _metadata phase_, the analysis prints to its
+standard output everything about the analysis which is not result data:
+analysis title, authors, description, result table column
+classes/titles/units, etc. This metadata is essential to interpret the
+result objects of the results phase.
+
+The output format of the metadata phase is always an UTF-8
+http://json.org/[JSON] object.
+
+
+==== Compatibility test phase
+
+During the _compatibility test phase_, either:
+
+* The analysis sets its exit status to 0 if the provided trace can
+  be analyzed, and prints nothing on to its standard output, or
+* The analysis sets its exit status to non-zero if the provided trace
+  cannot be analyzed, and, optionally, prints an
+  <<error-object,error object>> to its standard output.
+
+
+==== Results phase
+
+During the _results phase_, the consumer can perform
+as many analyses as required by running the analysis with the mandatory
+trace path argument.
+
+The output format of the results phase depends on the command-line
+arguments passed to the analysis program:
+
+* If `--output-progress` is passed, then the output format _may_
+  contain <<progress,progress indication>> lines, followed by an UTF-8
+  http://json.org/[JSON] object.
+* If `--output-progress` is _not_ passed, then the output format is
+  always an UTF-8 http://json.org/[JSON] object.
+
+In all the objects of the output format, an unknown key must be
+**ignored** by the consumer.
+
+
+[[error-object]]
+=== Error object
+
+An _error object_ indicates that the analysis encountered an error
+during its execution.
+
+.Properties of an error object
+|====
+|Property |Type |Description |Required? |Default value
+|`error-code` |String or number |Error code |No |No error code
+|`error-message` |String |Error message |Yes |
+|====
+
+.Error object
+====
+[source,json]
+----
+{
+  "error-message": "Cannot open trace \"/root/lttng-traces/my-session\": Permission denied",
+  "error-code": 1
+}
+----
+====
+
+
+[[data-objects]]
+=== Data objects
+
+_Data objects_ contain result data of specific classes.
+
+All data objects share a common `class` property which identifies the
+object's class. The available class names, as of this version of LAMI,
+are:
+
+|====
+|Class name (string) |Object |Inherits
+|`unknown` |<<unknown-object,Unknown object>> |Data object
+|`bool` |<<boolean-object,Boolean object>> |Data object
+|`number` |<<number-object,Number object>> |Data object
+|`string` |<<string-object,String object>> |Data object
+|`ratio` |<<ratio-object,Ratio object>> |<<number-object,Number object>>
+|`timestamp` |<<timestamp-object,Timestamp object>> |<<number-object,Number object>>
+|`duration` |<<duration-object,Duration object>> |<<number-object,Number object>>
+|`size` |<<size-object,Size object>> |<<number-object,Number object>>
+|`bitrate` |<<bitrate-object,Bitrate object>> |<<number-object,Number object>>
+|`time-range` |<<time-range-object,Time range object>> |Data object
+|`syscall` |<<syscall-object,Syscall object>> |Data object
+|`process` |<<process-object,Process object>> |Data object
+|`path` |<<path-object,Path object>> |Data object
+|`fd` |<<file-descriptor-object,File descriptor object>> |Data object
+|`irq` |<<irq-object,IRQ object>> |Data object
+|`cpu` |<<cpu-object,CPU object>> |Data object
+|`disk` |<<disk-object,Disk object>> |Data object
+|`part` |<<disk-partition-object,Disk partition object>> |Data object
+|`netif` |<<network-interface-object,Network interface object>> |Data object
+|====
+
+The following subsections explain each class of data object.
+
+
+[[unknown-object]]
+==== Unknown object
+
+The special _unknown object_ represents an unknown value. It is
+typically used in result table cells where a given computation cannot
+produce a result for some reason.
+
+.Properties of an unknown object
+|====
+|Property |Type |Description |Required? |Default value
+|`class` |String |Set to `"unknown"` |Yes |
+|====
+
+.Unknown object
+====
+[source,json]
+----
+{
+  "class": "unknown"
+}
+----
+====
+
+
+[[boolean-object]]
+==== Boolean object
+
+A _boolean object_ represents a boolean value.
+
+.Properties of a boolean object
+|====
+|Property |Type |Description |Required? |Default value
+|`class` |String |Set to `"bool"` |Yes
+|`value` |Boolean |Value | Yes |
+|====
+
+.Boolean object
+====
+[source,json]
+----
+{
+  "class": "bool",
+  "value": false
+}
+----
+====
+
+
+[[number-object]]
+==== Number object
+
+A _number object_ represents a number.
+
+.Properties of a number object
+|====
+|Property |Type |Description |Required? |Default value
+|`class`
+|String
+|Set to `"number"`
+|Yes
+|
+
+|`value`
+|Number
+|Value
+|Yes, if the `low` and `high` properties are missing
+|No value
+
+|`low`
+|Number or string
+|Lower bound (included) of the interval of values in which the value can be said to lie in
+|Yes, if the `value` property is missing
+|The value of the `value` property
+
+|`high`
+|Number or string
+|Higher bound (included) of the interval of values in which the value can be said to lie in
+|Yes, if the `value` property is missing
+|The value of the `value` property
+|====
+
+The `low` and `high` properties may be set to either `"-inf"` (negative
+infinity) or `"+inf"` (positive infinity).
+
+.Number object without limits
+====
+[source,json]
+----
+{
+  "class": "number",
+  "value": -23.75
+}
+----
+====
+
+.Number object with limits
+====
+[source,json]
+----
+{
+  "class": "number",
+  "value": 19.72,
+  "low": 15.99,
+  "high": 23.18
+}
+----
+====
+
+.Number object without value
+====
+[source,json]
+----
+{
+  "class": "number",
+  "low": 20.52,
+  "high": 24.18
+}
+----
+====
+
+.Number object with an infinite higher limit
+====
+[source,json]
+----
+{
+  "class": "number",
+  "low": 6675.92,
+  "high": "+inf"
+}
+----
+====
+
+
+[[string-object]]
+==== String object
+
+A _string object_ represents a string value.
+
+.Properties of a string object
+|====
+|Property |Type |Description |Required? |Default value
+|`class` |String |Set to `"string"` |Yes |
+|`value` |String |Value |Yes |
+|====
+
+.String object
+====
+[source,json]
+----
+{
+  "class": "string",
+  "value": "The LAMI specification is awesome!"
+}
+----
+====
+
+
+[[ratio-object]]
+==== Ratio object
+
+A _ratio object_ describes a simple, dimensionless ratio, that is,
+a relationship between two quantities having the same unit indicating
+how many times the first quantity contains the second.
+
+It is suggested that the consumer shows a ratio object as a percentage.
+
+.Properties of a ratio object
+|====
+|Property |Type |Description |Required? |Default value
+|`class`
+|String
+|Set to `"ratio"`
+|Yes
+|
+
+|`value`
+|Number
+|Ratio as a decimal fraction
+|Yes, if the `low` and `high` properties are missing
+|No value
+
+|`low`
+|Number
+|Lower bound (included) of the interval of values in which the value can be said to lie in
+|Yes, if the `value` property is missing
+|The value of the `value` property
+
+|`high`
+|Number
+|Higher bound (included) of the interval of values in which the value can be said to lie in
+|Yes, if the `value` property is missing
+|The value of the `value` property
+|====
+
+The `low` and `high` properties may be set to either `"-inf"` (negative
+infinity) or `"+inf"` (positive infinity).
+
+.Ratio object without limit
+====
+[source,json]
+----
+{
+  "class": "ratio",
+  "value": 0.57
+}
+----
+====
+
+.Ratio object without value
+====
+[source,json]
+----
+{
+  "class": "ratio",
+  "low": 0.23,
+  "high": 0.27
+}
+----
+====
+
+
+[[timestamp-object]]
+==== Timestamp object
+
+A _timestamp object_ describes a specific point in time.
+
+.Properties of a timestamp object
+|====
+|Property |Type |Description |Required? |Default value
+|`class`
+|String
+|Set to `"timestamp"`
+|Yes
+|
+
+|`value`
+|Number
+|Number of nanoseconds since Unix epoch
+|Yes, if the `low` and `high` properties are missing
+|No value
+
+|`low`
+|Number
+|Lower bound (included) of the interval of values in which the value can be said to lie in
+|Yes, if the `value` property is missing
+|The value of the `value` property
+
+|`high`
+|Number
+|Higher bound (included) of the interval of values in which the value can be said to lie in
+|Yes, if the `value` property is missing
+|The value of the `value` property
+|====
+
+The `low` and `high` properties may be set to either `"-inf"` (negative infinity) or `"+inf"` (positive infinity).
+
+.Timestamp object
+====
+[source,json]
+----
+{
+  "class": "timestamp",
+  "value": 1444334398154194201
+}
+----
+====
+
+
+[[duration-object]]
+==== Duration object
+
+A _duration object_ describes the difference between two points in time.
+
+.Properties of a duration object
+|====
+|Property |Type |Description |Required? |Default value
+|`class`
+|String
+|Set to `"duration"`
+|Yes
+|
+
+|`value`
+|Number
+|Time duration in nanoseconds
+|Yes, if the `low` and `high` properties are missing
+|No value
+
+|`low`
+|Number
+|Lower bound (included) of the interval of values in which the value can be said to lie in
+|Yes, if the `value` property is missing
+|The value of the `value` property
+
+|`high`
+|Number
+|Higher bound (included) of the interval of values in which the value can be said to lie in
+|Yes, if the `value` property is missing
+|The value of the `value` property
+|====
+
+The `low` and `high` properties may be set to either `"-inf"` (negative
+infinity) or `"+inf"` (positive infinity).
+
+.Duration object without limit
+====
+[source,json]
+----
+{
+  "class": "duration",
+  "value": 917238723
+}
+----
+====
+
+.Duration object with limits
+====
+[source,json]
+----
+{
+  "class": "duration",
+  "value": 1928,
+  "low": 1921,
+  "high": 1935
+}
+----
+====
+
+
+[[size-object]]
+==== Size object
+
+A _size object_ describes the size of a file, of a buffer, of a
+transfer, etc.
+
+.Properties of a size object
+|====
+|Property |Type |Description |Required? |Default value
+|`class`
+|String
+|Set to `"size"`
+|Yes
+|
+
+|`value`
+|Number
+|Size in bytes
+|Yes, if the `low` and `high` properties are missing
+|No value
+
+|`low`
+|Number
+|Lower bound (included) of the interval of values in which the value can be said to lie in
+|Yes, if the `value` property is missing
+|The value of the `value` property
+
+|`high`
+|Number
+|Higher bound (included) of the interval of values in which the value can be said to lie in
+|Yes, if the `value` property is missing
+|The value of the `value` property
+|====
+
+The `low` and `high` properties may be set to either `"-inf"` (negative
+infinity) or `"+inf"` (positive infinity).
+
+.Size object
+====
+[source,json]
+----
+{
+  "class": "size",
+  "value": 4994857
+}
+----
+====
+
+
+[[bitrate-object]]
+==== Bitrate object
+
+A _bitrate object_ describes a transfer rate.
+
+.Properties of a bitrate object
+|====
+|Property |Type |Description |Required? |Default value
+|`class`
+|String
+|Set to `"bitrate"`
+|Yes
+|
+
+|`value`
+|Number
+|Bitrate in bits/second
+|Yes, if the `low` and `high` properties are missing
+|No value
+
+|`low`
+|Number
+|Lower bound (included) of the interval of values in which the value can be said to lie in
+|Yes, if the `value` property is missing
+|The value of the `value` property
+
+|`high`
+|Number
+|Higher bound (included) of the interval of values in which the value can be said to lie in
+|Yes, if the `value` property is missing
+|The value of the `value` property
+|====
+
+The `low` and `high` properties may be set to either `"-inf"` (negative
+infinity) or `"+inf"` (positive infinity).
+
+.Bitrate object
+====
+[source,json]
+----
+{
+  "class": "bitrate",
+  "value": 9845154
+}
+----
+====
+
+
+[[time-range-object]]
+==== Time range object
+
+A _time range object_ describes an interval bounded by two point in
+time.
+
+.Properties of a time range object
+|====
+|Property |Type |Description |Required? |Default value
+|`class` |String |Set to `"time-range"` |Yes |
+|`begin` |<<timestamp-object,Timestamp object>> |Beginning timestamp |Yes |
+|`end` |<<timestamp-object,Timestamp object>> |End timestamp |Yes |
+|====
+
+.Time range object
+====
+[source,json]
+----
+{
+  "class": "time-range",
+  "begin": {
+    "class": "timestamp",
+    "value": 1444334398154194201
+  },
+  "end": {
+    "class": "timestamp",
+    "low": 1444334425194487548,
+    "value": 1444334425194487548,
+    "high": "+inf"
+  }
+}
+----
+====
+
+[[syscall-object]]
+==== Syscall object
+
+A _syscall object_ describes the name of a system call.
+
+.Properties of a syscall object
+|====
+|Property |Type |Description |Required? |Default value
+|`class` |String |Set to `"syscall"` |Yes |
+|`name` |String |System call name |Yes |
+|====
+
+.Syscall object
+====
+[source,json]
+----
+{
+  "class": "syscall",
+  "name": "write"
+}
+----
+====
+
+
+[[process-object]]
+==== Process object
+
+A _process object_ describes a system process.
+
+.Properties of a process object
+|====
+|Property |Type |Description |Required? |Default value
+|`class` |String |Set to `"process"` |Yes |
+|`name` |String |Process name |No |No process name
+|`pid` |Integer |Process ID (PID) |No |No process ID
+|`tid` |Integer |Thread ID (TID) |No |No thread ID
+|====
+
+.Process object
+====
+[source,json]
+----
+{
+  "class": "process",
+  "name": "python",
+  "pid": 1548,
+  "tid": 1549
+}
+----
+====
+
+
+[[path-object]]
+==== Path object
+
+A _path object_ describes a relative or absolute file system path.
+
+.Properties of a path object
+|====
+|Property |Type |Description |Required? |Default value
+|`class` |String |Set to `"path"` |Yes |
+|`path` |String |File system path |Yes |
+|====
+
+.Path object
+====
+[source,json]
+----
+{
+  "class": "path",
+  "path": "/usr/bin/grep"
+}
+----
+====
+
+
+[[file-descriptor-object]]
+==== File descriptor object
+
+A _file descriptor object_ describes the numeric descriptor of a file.
+
+.Properties of a file descriptor object
+|====
+|Property |Type |Description |Required? |Default value
+|`class` |String |Set to `"fd"` |Yes |
+|`fd` |Integer |File descriptor |Yes |
+|====
+
+.File descriptor object
+====
+[source,json]
+----
+{
+  "class": "fd",
+  "fd": 8
+}
+----
+====
+
+
+[[irq-object]]
+==== IRQ object
+
+An _IRQ object_ describes an interrupt source.
+
+.Properties of an IRQ object
+|====
+|Property |Type |Description |Required? |Default value
+|`class` |String |Set to `"irq"` |Yes |
+|`hard` |Boolean |`true` if this interrupt source generates hardware interrupts, `false` for software interrupts |No |`true`
+|`nr` |Integer |Interrupt source number |Yes |
+|`name` |String |Interrupt source name |No |No interrupt source name
+|====
+
+.IRQ object
+====
+[source,json]
+----
+{
+  "class": "irq",
+  "hard": true,
+  "nr": 42,
+  "name": "ahci"
+}
+----
+====
+
+
+[[cpu-object]]
+==== CPU object
+
+A _CPU object_ describes a numeric CPU identifier.
+
+.Properties of a CPU object
+|====
+|Property |Type |Description |Required? |Default value
+|`class` |String |Set to `"cpu"` |Yes |
+|`id` |Integer |CPU identifier number |Yes |
+|====
+
+.CPU object
+====
+[source,json]
+----
+{
+  "class": "cpu",
+  "id": 1
+}
+----
+====
+
+
+[[disk-object]]
+==== Disk object
+
+A _disk object_ describes a disk name.
+
+.Properties of a disk object
+|====
+|Property |Type |Description |Required? |Default value
+|`class` |String |Set to `"disk"` |Yes |
+|`name` |String |Disk name |Yes |
+|====
+
+.Disk object
+====
+[source,json]
+----
+{
+  "class": "disk",
+  "name": "sda"
+}
+----
+====
+
+
+[[disk-partition-object]]
+==== Disk partition object
+
+A _disk partition object_ describes a disk partition name.
+
+.Properties of a disk partition object
+|====
+|Property |Type |Description |Required? |Default value
+|`class` |String |Set to `"part"` |Yes |
+|`name` |String |Disk partition name |Yes |
+|====
+
+.Disk partition object
+====
+[source,json]
+----
+{
+  "class": "part",
+  "name": "sdb2"
+}
+----
+====
+
+
+[[network-interface-object]]
+==== Network interface object
+
+A _network interface object_ describes a network interface name.
+
+.Properties of an error object
+|====
+|Property |Type |Description |Required? |Default value
+|`class` |String |Set to `"netif"` |Yes |
+|`name` |String |Network interface name |Yes |
+|====
+
+.Network interface object
+====
+[source,json]
+----
+{
+  "class": "netif",
+  "name": "eth0"
+}
+----
+====
+
+
+[[metadata-phase-objects]]
+=== Metadata phase objects
+
+The _metadata phase_ explains the eventual results of the analysis. It
+provides an optional title for the analysis and the format of the result
+tables (printed during the <<results-phase-objects,results phase>> by the
+same analysis).
+
+The metadata phase writes one of the following objects:
+
+* A <<metadata-object,metadata object>>.
+* An <<error-object,error object>>.
+
+The following subsections document objects that can only be written
+during the metadata phase.
+
+
+[[column-description-object]]
+==== Column description object
+
+A _column description object_ describes one table _column_.
+
+[cols="default,default,asciidoc,default,default"]
+.Properties of a column description object
+|====
+|Property |Type |Description |Required? |Default value
+|`title` |String |Column's title |No |No title
+
+|`class`
+|String
+|
+Class of data in column's cells, amongst:
+
+`"bool"`::
+  <<boolean-object,Boolean objects>>.
+
+`"number"`::
+  <<number-object,Number objects>>.
+
+`"string"`::
+  <<string-object,String objects>>.
+
+`"ratio"`::
+  <<ratio-object,Ratio objects>>.
+
+`"timestamp"`::
+  <<timestamp-object,Timestamp objects>>.
+
+`"duration"`::
+  <<duration-object,Duration objects>>.
+
+`"size"`::
+  <<size-object,Size objects>>.
+
+`"bitrate"`::
+  <<bitrate-object,Bitrate objects>>.
+
+`"time-range"`::
+  <<time-range-object,Time range objects>>.
+
+`"syscall"`::
+  <<syscall-object,Syscall objects>>.
+
+`"process"`::
+  <<process-object,Process objects>>.
+
+`"path"`::
+  <<path-object,Path objects>>.
+
+`fd`::
+  <<file-descriptor-object,File descriptor objects>>.
+
+`"irq"`::
+  <<irq-object,IRQ objects>>.
+
+`"cpu"`::
+  <<cpu-object,CPU objects>>.
+
+`"disk"`::
+  <<disk-object,Disk objects>>.
+
+`"part"`::
+  <<disk-partition-object,Disk partition objects>>.
+
+`"netif"`::
+  <<network-interface-object,Network interface objects>>.
+
+`"mixed"`::
+  Any object.
+
+|No
+|`mixed`
+
+|`unit` |String |Column's unit, if the `class` property is `number` |No |No unit
+|====
+
+.Column description object (system call column)
+====
+[source,json]
+----
+{
+  "title": "System call",
+  "class": "syscall"
+}
+----
+====
+
+.Column description object (number column with a unit)
+====
+[source,json]
+----
+{
+  "title": "Count",
+  "class": "number",
+  "unit": "interrupts"
+}
+----
+====
+
+
+[[table-class-object]]
+==== Table class object
+
+A _table class object_ describes one class of
+<<result-table-object,result table>>.
+
+.Properties of a table class object
+|====
+|Property |Type |Description |Required? |Default value
+|`inherit` |String |Name of inherited table class |No |No inheritance
+|`title` |String |Table's title |No |No title
+|`column-descriptions` |Array of <<column-description-object,column description objects>> |Descriptions of table's columns |No |Zero columns
+|====
+
+When inheriting another table class using the `inherit` property,
+the `title` and `column-descriptions` properties override the
+inherited values.
+
+.Table class object without inheritance
+====
+[source,json]
+----
+{
+  "title": "Handler duration and raise latency statistics (hard IRQ)",
+  "column-descriptions": [
+    {
+      "title": "IRQ",
+      "class": "irq"
+    },
+    {
+      "title": "Count",
+      "class": "number",
+      "unit": "interrupts"
+    },
+    {
+      "title": "Minimum duration",
+      "class": "duration"
+    },
+    {
+      "title": "Average duration",
+      "class": "duration"
+    },
+    {
+      "title": "Maximum duration",
+      "class": "duration"
+    },
+    {
+      "title": "Standard deviation",
+      "class": "duration"
+    }
+  ]
+}
+----
+====
+
+.Table class object with inheritance
+====
+This table class object redefines the title, but keeps the same
+column descriptions.
+
+[source,json]
+----
+{
+  "inherit": "irq-stats",
+  "title": "IRQ statistics (ehci_hcd:usb1 [16])"
+}
+----
+====
+
+
+[[version-object]]
+==== Version object
+
+.Properties of a version object
+|====
+|Property |Type |Description |Required? |Default value
+|`major` |Integer |Major version |Yes, if the `minor` property exists |No major version
+|`minor` |Integer |Minor version |Yes, if the `patch` property exists |No minor version
+|`patch` |Integer |Patch version |No |No patch version
+|`extra` |String |Extra version information (for example: `"dev"`, `"pre"`, `"rc2"`, commit ID) |No |No extra version
+|====
+
+.Version object
+====
+[source,json]
+----
+{
+  "major": 1,
+  "minor": 2,
+  "patch": 5,
+  "extra": "dev"
+}
+----
+====
+
+[[metadata-object]]
+==== Metadata object
+
+[cols="default,default,asciidoc,default,default"]
+.Properties of an error object
+|====
+|Property |Type |Description |Required? |Default value
+|`mi-version`
+|<<version-object,Version object>>
+|
+LAMI version produced by this analysis, amongst:
+
+* `{"major": 1, "minor": 0}`
+
+|Yes
+|
+
+|`version`
+|<<version-object,Version object>>
+|Version of the analysis
+|No
+|No version
+
+|`title`
+|String
+|Analysis title
+|No
+|No title
+
+|`authors`
+|Array of strings
+|Author(s) of the analysis
+|No
+|No authors
+
+|`description`
+|String
+|Analysis description
+|No
+|No description
+
+|`url`
+|String
+|URL where to find the analysis
+|No
+|No URL
+
+|`tags`
+|Array of strings
+|List of tags associated with the analysis
+|No
+|No tags
+
+|`table-classes`
+|Object mapping table class names (strings) to <<table-class-object,table class objects>>
+|Classes of potential result tables
+|Yes (at least one table class)
+|
+|====
+
+The `table-classes` property describes all the potential result tables
+with a static layout that can be generated by the
+<<results-phase-objects,results phase>>. A result table can specify the
+name of its table class, or define a full table class in place for
+dynamic result tables.
+
+.Metadata object
+====
+[source,json]
+----
+{
+  "mi-version": {
+    "major": 1,
+    "minor": 0
+  },
+  "version": {
+    "major": 1,
+    "minor": 2,
+    "patch": 5,
+    "extra": "dev"
+  },
+  "title": "I/O latency statistics",
+  "authors": [
+    "Julien Desfossez",
+    "Antoine Busque"
+  ],
+  "description": "Provides statistics about the latency involved in various I/O operations.",
+  "url": "https://github.com/lttng/lttng-analyses",
+  "tags": [
+    "io",
+    "stats",
+    "linux-kernel",
+    "lttng-analyses"
+  ],
+  "table-classes": {
+    "syscall-latency": {
+      "title": "System calls latency statistics",
+      "column-descriptions": [
+        {"title": "System call", "class": "syscall"},
+        {"title": "Count", "class": "number", "unit": "operations"},
+        {"title": "Minimum duration", "class": "duration"},
+        {"title": "Average duration", "class": "duration"},
+        {"title": "Maximum duration", "class": "duration"},
+        {"title": "Standard deviation", "class": "duration"}
+      ]
+    },
+    "disk-latency": {
+      "title": "Disk latency statistics",
+      "column-descriptions": [
+        {"title": "Disk name", "class": "disk"},
+        {"title": "Count", "class": "number", "unit": "operations"},
+        {"title": "Minimum duration", "class": "duration"},
+        {"title": "Average duration", "class": "duration"},
+        {"title": "Maximum duration", "class": "duration"},
+        {"title": "Standard deviation", "class": "duration"}
+      ]
+    }
+  }
+}
+----
+====
+
+
+[[results-phase-objects]]
+=== Results phase objects
+
+The _results phase_ prints the actual data computed by the analysis. The
+consumer needs the metadata object of the
+<<metadata-phase-objects,metadata phase>> in order to interpret the data
+of the results phase.
+
+If the `--output-progress` option is passed to the analysis program,
+then the analysis _may_ output <<progress,progress indication>> lines
+before writing its main object.
+
+The the results phase writes one of the following objects:
+
+* An <<analysis-results-object,analysis results object>>.
+* An <<error-object,error object>>.
+
+The following subsections document objects that can only be written
+during the results phase.
+
+
+[[progress]]
+==== Progress
+
+Zero or more _progress lines_ may be written by the analysis during the
+results phase _before_ it writes its main object. Progress lines are
+only written if the `--output-progress` option is passed to the analysis
+program.
+
+The format of a progress line is as follows (plain text):
+
+    VALUE[ MESSAGE]
+
+where:
+
+`VALUE`::
+  A floating point number from 0 to 1 indicating the current
+  progress of the analysis, or the string `*` which means that the
+  analysis is not able to estimate when it will finish.
+`MESSAGE`::
+  An optional message which accompanies the progress
+  indication.
+
+Note that `VALUE` and `MESSAGE` are delimited by a single space
+character.
+
+The line must be terminated by a Unix newline (ASCII LF).
+
+If one progress line has the `*` value, _all_ the progress lines should
+have it.
+
+.Progress indication with values
+====
+----
+0 Starting the analysis
+0 About to process 1248 events
+0.17 38/1248 events procesed
+0.342 142/1248 events processed
+0.53 203/1248 events processed
+0.54 Connecting to database
+0.54 Connected
+0.65
+0.663
+0.681 511/1248 events processed
+0.759 810/1248 events processed
+0.84 1051/1248 events processed
+0.932 1194/1248 events processed
+0.98 1248/1248 events processed
+1 Done!
+{ JSON result object }
+----
+====
+
+.Progress indication without values
+====
+----
+* Starting the analysis
+* 124 events procesed
+* 1150 events processed
+* 3845 events processed
+* Connecting to database
+* Connected
+* 9451 events processed
+* 11542 events processed
+* 15464 events processed
+* 17704 events processed
+* 21513 events processed
+* Done!
+{ JSON result object }
+----
+====
+
+
+[[result-table-object]]
+==== Result table object
+
+A _result table object_ represents the data of an analysis in rows and
+columns.
+
+.Properties of a result table object
+|====
+|Property |Type |Description |Required? |Default value
+|`time-range`
+|<<time-range-object,Time range object>>
+|Time range over which the results contained in this table apply
+|Yes
+|
+
+|`class`
+|String or <<table-class-object,table class object>>
+|Table class name or table class object containing the metadata of this result table
+|Yes
+|
+
+|`data`
+|Array of arrays of <<data-objects,data objects>>/plain JSON values
+|Result table rows
+|Yes
+|
+|====
+
+The `class` property indicates either:
+
+* The name of the <<table-class-object,table class object>>,
+  as defined in the <<metadata-phase-objects,metadata phase>>,
+  describing this result table.
+* A complete <<table-class-object,table class object>>. This is
+  useful when the result table's layout is dynamic (dynamic title,
+  dynamic column descriptions).
+
+The `data` property is a JSON array of rows. Each row is a JSON array of
+column cells. Each column cell contains a value (either a plain JSON
+value, or a <<data-objects,data object>>), as described by the `class`
+property of the associated
+<<column-description-object,column description object>>.
+
+Any column cell may contain the <<unknown-object,unknown object>> when
+it would be possible to get a result for this cell, but the result is
+unknown.
+
+Any column cell may contain `null` when the cell is **empty**.
+
+.Result table object
+====
+[source,json]
+----
+{
+  "time-range": {
+    "class": "time-range",
+    "begin": {
+      "class": "timestamp",
+      "value": 1444334398154194201
+    },
+    "end": {
+      "class": "timestamp",
+      "value": 1444334425194487548
+    }
+  },
+  "class": "syscall-latency",
+  "data": [
+    [
+      {"class": "syscall", "name": "open"},
+      {"class": "number", "value": 23},
+      {"class": "duration", "value": 5562},
+      {"class": "duration", "value": 13835},
+      {"class": "duration", "value": 77683},
+      {"class": "duration", "value": 15263}
+    ],
+    [
+      {"class": "syscall", "name": "read"},
+      {"class": "number", "value": 109},
+      {"class": "duration", "value": 316},
+      {"class": "duration", "value": 5774},
+      {"class": "unknown"},
+      {"class": "duration", "value": 9277}
+    ]
+  ]
+}
+----
+====
+
+.Result table object with dynamic title
+====
+[source,json]
+----
+{
+  "time-range": {
+    "class": "time-range",
+    "begin": {
+      "class": "timestamp",
+      "value": 1444334398154194201
+    },
+    "end": {
+      "class": "timestamp",
+      "value": 1444334425194487548
+    }
+  },
+  "class": {
+    "inherit": "some-latency",
+    "title": "Latency of my stuff [42, 19, -3]"
+  },
+  "data": [
+    [
+      {"class": "syscall", "name": "open"},
+      {"class": "number", "value": 45},
+      {"class": "duration", "value": 5562},
+      {"class": "duration", "value": 13835},
+      {"class": "duration", "value": 77683},
+      {"class": "duration", "value": 15263}
+    ],
+    [
+      {"class": "syscall", "name": "read"},
+      {"class": "number", "value": 109},
+      {"class": "duration", "value": 316},
+      {"class": "duration", "value": 5774},
+      {"class": "unknown"},
+      {"class": "duration", "value": 9277}
+    ]
+  ]
+}
+----
+====
+
+.Result table object with dynamic column descriptions
+====
+[source,json]
+----
+{
+  "time-range": {
+    "class": "time-range",
+    "begin": {
+      "class": "timestamp",
+      "value": 1444334398154194201
+    },
+    "end": {
+      "class": "timestamp",
+      "value": 1444334425194487548
+    }
+  },
+  "class": {
+    "title": "System call stuff for process zsh [4723]",
+    "column-descriptions": [
+      {
+        "title": "System call involved",
+        "class": "syscall"
+      },
+      {
+        "title": "Count in region AX:23",
+        "class": "number"
+      },
+      {
+        "title": "Count in region BC:86",
+        "class": "number"
+      },
+      {
+        "title": "Count in region HE:37",
+        "class": "number"
+      }
+    ]
+  },
+  "data": [
+    [
+      {
+        "class": "syscall",
+        "name": "read"
+      },
+      {"class": "number", "value": 19},
+      {"class": "number", "value": 155},
+      {"class": "number", "value": 2}
+    ],
+    [
+      {
+        "class": "syscall",
+        "name": "write"
+      },
+      {"class": "number", "value": 45},
+      {"class": "number", "value": 192},
+      {"class": "number", "value": 17}
+    ]
+  ]
+}
+----
+====
+
+
+[[analysis-results-object]]
+==== Analysis results object
+
+An _analysis results object_ contains the actual data outputted by the
+analysis.
+
+.Properties of an analysis results object
+|====
+|Property |Type |Description |Required? |Default value
+|`results` |Array of <<result-table-object,result table objects>> |Analysis results tables |Yes |
+|====
+
+.Analysis results object
+====
+[source,json]
+----
+{
+  "results": [
+    {
+      "time-range": {
+        "class": "time-range",
+        "begin": {
+          "class": "timestamp",
+          "value": 1444334398154194201
+        },
+        "end": {
+          "class": "timestamp",
+          "value": 1444334425194487548
+        }
+      },
+      "class": "syscall-latency",
+      "data": [
+        [
+          {"class": "syscall", "name": "open"},
+          {"class": "number", "value": 45},
+          {"class": "duration", "value": 5562},
+          {"class": "duration", "value": 13835},
+          {"class": "duration", "value": 77683},
+          {"class": "duration", "value": 15263}
+        ],
+        [
+          {"class": "syscall", "name": "read"},
+          {"class": "number", "value": 109},
+          {"class": "duration", "value": 316},
+          {"class": "duration", "value": 5774},
+          {"class": "unknown"},
+          {"class": "duration", "value": 9277}
+        ]
+      ]
+    },
+    {
+      "time-range": {
+        "class": "time-range",
+        "begin": {
+          "class": "timestamp",
+          "value": 1444334425194487549,
+        },
+        "end": {
+          "class": "timestamp",
+          "value": 1444334425254887190
+        }
+      },
+      "class": "syscall-latency",
+      "data": [
+        [
+          {"class": "syscall", "name": "open"},
+          {"class": "number", "value": 45},
+          {"class": "duration", "value": 1578},
+          {"class": "duration", "value": 16648},
+          {"class": "duration", "value": 15444},
+          {"class": "duration", "value": 68540}
+        ],
+        [
+          {"class": "syscall", "name": "read"},
+          {"class": "number", "value": 109},
+          {"class": "duration", "value": 78},
+          {"class": "duration", "value": 1948},
+          {"class": "duration", "value": 11184},
+          {"class": "duration", "value": 94670}
+        ]
+      ]
+    }
+  ]
+}
+----
+====
